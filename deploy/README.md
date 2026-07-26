@@ -54,7 +54,8 @@ export CREDENTIAL_ENCRYPTION_KEYS="<current-base64url-key>,<previous-base64url-k
 
 1. 备份数据库，并记录当前 key ring。
 2. 生成新 32 字节 key；将它放在 `CREDENTIAL_ENCRYPTION_KEYS` 的第一个位置，旧 key 保留在后面。
-3. 重启后端使新配置生效，执行 `cd backend && python manage.py rotate_credential_keys`。
+3. 停止后端写入以建立独占维护窗口；SQLite 不提供行级 `SELECT ... FOR UPDATE` 锁。
+4. 执行 `cd backend && python manage.py rotate_credential_keys --maintenance-window`。
 4. 验证命令成功、应用可读取既有实例和配对记录，并完成数据库备份校验。
 5. 从环境变量移除旧 key，再次重启后端；此时旧 key 可以安全下线。
 
