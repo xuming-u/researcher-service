@@ -23,7 +23,9 @@ class TestCredentialCipher:
     def test_tampered_ciphertext_is_rejected(self):
         cipher = CredentialCipher((bytes(range(32)),))
         ciphertext = cipher.encrypt('device-token')
-        tampered = ciphertext[:-1] + ('A' if ciphertext[-1] != 'A' else 'B')
+        alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+        last_index = alphabet.index(ciphertext[-1])
+        tampered = ciphertext[:-1] + alphabet[last_index ^ 1]
         with pytest.raises(InvalidCredentialCiphertext):
             cipher.decrypt(tampered)
 
